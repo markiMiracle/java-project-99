@@ -1,9 +1,8 @@
 name: Java CI
 
-
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
 
 jobs:
   build:
@@ -11,18 +10,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.8
+
       - run: gradle --version
+      
+      # Build the project
       - run: make build
+      
+      # Run tests with coverage
       - run: make test
-      - run: make lint
+      
+      # Generate JaCoCo coverage report
       - run: ./gradlew jacocoTestReport
+      
+      # Linting step (optional)
+      - run: make lint
+      
+      # Publish code coverage
       - name: Publish code coverage
         uses: actions/upload-artifact@v3
         with:
