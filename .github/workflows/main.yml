@@ -20,6 +20,7 @@ jobs:
         with:
           gradle-version: 8.8
 
+      - run: chmod +x ./gradlew    
       - run: gradle --version
       
       # Build the project
