@@ -22,11 +22,9 @@ jobs:
       - run: make build
       - run: make test
       - run: make lint
+      - run: ./gradlew jacocoTestReport
       - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v5.0.0
-        env:
-           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-           JACOCO_SOURCE_PATH: app/src/main/java
+        uses: actions/upload-artifact@v3
         with:
-           coverageCommand: make report
-           coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
