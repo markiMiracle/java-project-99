@@ -7,6 +7,10 @@ plugins {
 	checkstyle
 }
 
+jacoco {
+	toolVersion = "0.8.10"
+}
+
 application {
 	mainClass.set("hexlet.code.AppApplication")
 }
@@ -48,4 +52,6 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-tasks.jacocoTestReport { reports { xml.required.set(true) } }
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
