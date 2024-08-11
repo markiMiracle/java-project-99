@@ -35,16 +35,22 @@ repositories {
 }
 
 dependencies {
+
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	runtimeOnly("com.h2database:h2")
+	implementation("org.springframework.boot:spring-boot-starter-validation:3.3.2")
+	implementation("org.springframework.boot:spring-boot-starter:3.3.2")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.2")
+	implementation("org.springframework.boot:spring-boot-starter-web:3.3.2")
 	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	developmentOnly("org.springframework.boot:spring-boot-devtools:3.3.2")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:3.3.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
