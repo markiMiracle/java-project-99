@@ -35,7 +35,7 @@ public class User {
     @Email
     private String email;
     @NotBlank
-    private String password;
+    private String passwordDigest;
     @CreatedDate
     private LocalDate createdAt;
     @LastModifiedDate

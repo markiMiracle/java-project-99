@@ -5,4 +5,4 @@ spring:
       ddl-auto: update
     show-sql: true
   profiles:
-    active: prod
+    active: ${PROFILE:dev}
