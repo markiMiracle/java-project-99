@@ -12,14 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -32,6 +38,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class UserControllerTest {
 
     @Autowired
+    private WebApplicationContext wac;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -42,6 +51,7 @@ public class UserControllerTest {
 
     private User user;
 
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setup() {
@@ -53,12 +63,18 @@ public class UserControllerTest {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getPasswordDigest), () -> faker.naruto().character())
                 .create();
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
+                .apply(springSecurity())
+                .build();
+        token = jwt().jwt(builder -> builder.subject(user.getEmail()));
     }
 
 
     @Test
     public void testIndex() throws Exception {
-        var request = get("/api/users")
+        var request = get("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON);
 
         var result = mockMvc.perform(request)
@@ -73,7 +89,7 @@ public class UserControllerTest {
     public void testShow() throws Exception {
         repository.save(user);
 
-        var request = get("/api/users/" + user.getId());
+        var request = get("/api/users/" + user.getId()).with(jwt());
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
@@ -81,7 +97,7 @@ public class UserControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var request = post("/api/users")
+        var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(user));
 
@@ -98,6 +114,7 @@ public class UserControllerTest {
         data.put("lastName", "Uzumaki");
 
         var request = put("/api/users/" + user.getId())
+                .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
@@ -115,7 +132,7 @@ public class UserControllerTest {
     public void testDelete() throws Exception {
         repository.save(user);
 
-        var request = delete("/api/users/" + user.getId());
+        var request = delete("/api/users/" + user.getId()).with(token);
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());

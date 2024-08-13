@@ -4,9 +4,11 @@ package hexlet.code.service;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.exception.AccessDeniedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.UserUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
     private UserMapper mapper;
+
+    private UserUtils userUtils;
 
 
     @Override
@@ -45,13 +49,22 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserUpdateDTO userData) {
         var currentUser = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователя с id " + id + " не существует"));
-        mapper.update(userData, currentUser);
-        repository.save(currentUser);
-        return mapper.map(currentUser);
+        if (userUtils.getCurrentUser().getEmail().equals(currentUser.getEmail())) {
+            mapper.update(userData, currentUser);
+            repository.save(currentUser);
+            return mapper.map(currentUser);
+        }
+        throw new AccessDeniedException("Access Denied");
     }
 
     @Override
     public void deleteUser(Long id) {
-        repository.deleteById(id);
+        var currentUser = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователя с id " + id + " не существует"));
+        if (userUtils.getCurrentUser().getEmail().equals(currentUser.getEmail())) {
+            repository.deleteById(id);
+            return;
+        }
+        throw new AccessDeniedException("Access Denied");
     }
 }

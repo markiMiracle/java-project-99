@@ -53,6 +53,8 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.3.2")
 	implementation("org.springframework.boot:spring-boot-starter:3.3.2")

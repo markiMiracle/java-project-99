@@ -22,5 +22,7 @@ public class DataInitializer implements ApplicationRunner {
         userData.setFirstName("Ryan");
         userData.setLastName("Gosling");
         userService.createUser(userData);
+        userData.setEmail("miracle@gmail.com");
+        userService.createUser(userData);
     }
 }
